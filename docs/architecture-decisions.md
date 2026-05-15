@@ -10,11 +10,25 @@ dated; reversed decisions are struck through, not deleted.
 - **Dev environment is Linux x86_64** (remote container, Node 22, Docker
   available). Demo + Lace wallet flow run on macOS. Mac M-series compatibility
   risk from the original plan is therefore deferred to Phase 5 only.
-- **Toolchain pins (locked):** `@midnight-ntwrk/compact-runtime@0.15.0`,
-  `@midnight-ntwrk/midnight-js-*@4.0.4`, `@midnight-ntwrk/dapp-connector-api`
-  (version verified at install time, not assumed), `compactc` 0.31.0 via Nix,
-  proof server `midnightnetwork/proof-server:4.0.0`. Q20 reconnaissance had
-  these wrong; live `example-zkloan` repo is the source of truth.
+- **Toolchain pins (locked from live example-zkloan README, 2026-05-15):**
+  - `@midnight-ntwrk/ledger-v8@8.0.3`
+  - `@midnight-ntwrk/compact-runtime@0.15.0`
+  - `@midnight-ntwrk/compact-js@2.5.0`
+  - `@midnight-ntwrk/midnight-js-*@4.0.4`
+  - `@midnight-ntwrk/dapp-connector-api@4.0.1`
+  - `@midnight-ntwrk/wallet-sdk-facade` / `dust-wallet` / `hd` `@3.0.0`
+  - `@midnight-ntwrk/wallet-sdk-shielded` / `unshielded-wallet` `@2.1.0`
+  - Compact toolchain `compact compile` version **0.30.0** (via the `compact`
+    devtool — NOT `compactc` via Nix as original plan claimed)
+  - Compact language pragma **0.22** (NOT 0.14 as plan claimed — would not
+    compile)
+  - Proof server image `midnightntwrk/proof-server:8.0.3`
+  - Indexer image `midnightntwrk/indexer-standalone:4.0.1`
+  - Node image `midnightntwrk/midnight-node:0.22.3`
+
+  Q20 reconnaissance was wrong on at least 4 of these. The original plan
+  inherited some of those errors. Live `example-zkloan` README is the source
+  of truth.
 - **Repo layout:** research PDFs live in `research/` (out of root). Generated
   Compact artifacts (`contract/src/managed/`) are gitignored — regenerable
   from source. Demo recordings are gitignored (hosted externally).
@@ -39,29 +53,50 @@ pitch-video gate.
 
 ---
 
-## Compact stdlib assumptions to verify in Phase 1 (do not trust the plan)
+## Compact patterns — corrected from live example-zkloan (2026-05-15)
 
-The original plan's Compact snippets contain at least three patterns that
-likely don't compile against `compact-runtime` 0.15.0. Verify against
-`example-zkloan/src/*.compact` and the stdlib types file **before** writing
-new circuits.
+The original plan's Compact snippets had several errors that would have
+blocked compilation. Patterns below are verbatim from
+`/tmp/example-zkloan/contract/src/zkloan-credit-scorer.compact`:
 
-1. **`poolBalance: Counter` is probably wrong.** `Counter` in 0.15.0 typically
-   only supports `increment()` with no argument (always +1). For variable
-   amounts we need `Cell<Uint<64>>` and explicit read/write. **First thing to
-   fix in Phase 1.3.**
-2. **`persistentHash<Bytes<32>>(a, b)` two-arg form** likely doesn't exist.
-   Standard pattern: concatenate / wrap-in-tuple first, then hash a single
-   value. Plan to lose 30–60min iterating here.
-3. **`Map.lookup`** may raise on missing key, or may return an `Option` — name
-   and semantics vary by stdlib version. Always guard with `.member()` first
-   (plan already does this).
-4. **`ZswapCoinPublicKey` as `Map` value type** — verify storable, not just
-   passable as an argument.
-5. **`@midnight-ntwrk/dapp-connector-api@4.0.1`** — verify the version exists
-   on npm before Phase 3 frontend work begins.
-6. **Lace 2.0.4** — wallet has shipped past 2.x; mainnet flow may require a
-   newer build. Re-check at Phase 5.
+1. **Pragma is `pragma language_version 0.22;`** (plan said 0.14 — wrong).
+2. **Admin pattern: do NOT use `localSk()` witness.** Use the built-in
+   `ownPublicKey()` and store `ledger admin: ZswapCoinPublicKey`. Guard with
+   `assert(ownPublicKey() == admin, "Only admin can ...");`. Much cleaner
+   than the plan's hashed-secret-key pattern.
+3. **Hash signature is `persistentHash<T>(value)` single-arg with type
+   parameter.** To combine multiple values, use
+   `persistentHash<Vector<N, T>>([a, b, ...])`. The plan's
+   `persistentHash<Bytes<32>>(digest, salt)` two-arg form does not exist —
+   needs to be `persistentHash<Vector<2, Bytes<32>>>([digest, salt])`.
+4. **`transientHash<T>(value)`** exists alongside `persistentHash` — used for
+   in-circuit hashing that doesn't need to be reproducible off-chain.
+5. **`disclose(value)`** wraps witness-derived values when they need to be
+   published into ledger state or used in assertions on public state.
+6. **`Map.lookup(k)` returns the value directly** (after `.member(k)` guard);
+   does NOT return an Option. Nested `Map.lookup(k1).lookup(k2)` and
+   `Map.lookup(k1).insert(k2, v)` work for `Map<K1, Map<K2, V>>`.
+7. **`default<T>`** for default values when inserting into Maps.
+8. **No `Counter` needed for `poolBalance`.** Just declare
+   `ledger poolBalance: Uint<64>;` and assign with arithmetic
+   (`poolBalance = poolBalance + amount;`). Verify on first compile pass.
+9. **`Set.insert / .member / .remove`** all available.
+10. **`Uint<16>` is the standard width** used throughout the reference repo;
+    `Uint<64>` for pool amounts should still work but we may need `Uint<32>`
+    if 64 hits a circuit-size ceiling.
+
+Nullifier-replay pattern for SafePassage claim circuit:
+
+```compact
+const nullifier = persistentHash<Vector<2, Bytes<32>>>([codeDigest, issuerSalt]);
+assert(!nullifiers.member(nullifier), "claim: nullifier already used");
+nullifiers.insert(nullifier);
+```
+
+Frontend toolchain still to verify at Phase 3 start:
+- `@midnight-ntwrk/dapp-connector-api@4.0.1` exists on npm — confirmed by
+  example-zkloan README dependency table.
+- Lace wallet build version compatible with mainnet — re-check at Phase 5.
 
 ---
 
