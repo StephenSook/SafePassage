@@ -183,6 +183,24 @@ The cinematic frontend (Phase 3.2+) and mainnet deploy (Phase 5) are
 
 ---
 
+## 2026-05-15 (late afternoon) — Team composition + mainnet stance updates
+
+**Team:** SafePassage is registered as a 2-person team. Stephen Sookra (lead engineer + design + pitch) plus Vinh (teammate). Vinh does not contribute commits or code. His presence on the team satisfies the MLH Devpost rule that prize eligibility requires teams of 2-5 members. Confirmed by Oscar (MLH) in the Midnight Hackathon Discord 2026-05-15: "You can participate solo, but you are only eligible for prizes in a team of 2-5 people."
+
+**Mainnet stance:** Phase 5 mainnet deploy is now OPTIONAL for prize eligibility. Jay Albert (Midnight Foundation team) in Discord 2026-05-15: "Mainnet not required. If you plan to deploy to the network, focus on preprod." Decision: pursue mainnet anyway as a stretch goal, since it strengthens the project against the Technology + Completion + Business Value judging dimensions. Hour-42 kill switch is RELAXED — if mainnet fails, submit with Preprod + README note. Mainnet is no longer a project-destroying failure mode.
+
+**Official judging criteria:** Locked from Devpost 2026-05-15. Six dimensions:
+1. Technology — technical impressiveness, problem difficulty, clever technique
+2. Originality — fresh/bold concept, unique privacy/identity/security angle
+3. Execution — polish in core functionality + UI
+4. Completion — demonstrably complete in focused scope
+5. Documentation — README clarity, goal communication, run instructions
+6. Business Value — real-world product viability
+
+README updated to map each repo asset to one criterion at the bottom of the file.
+
+---
+
 ## Missing pieces flagged for Build Club cold-read (deferred to Phase 4)
 
 - `docs/threat-model.md` — adversary model, what leaks, what's protected.
