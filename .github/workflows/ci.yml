@@ -6,51 +6,27 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Typecheck contract
-        run: |
-          if [ -f contract/package.json ]; then
-            cd contract
-            npm install --no-audit --no-fund
-            npm run typecheck || echo "contract typecheck skipped (compact artifacts not generated)"
-          fi
-      - name: Typecheck cli
-        run: |
-          if [ -f cli/package.json ]; then
-            cd cli
-            npm install --no-audit --no-fund
-            npm run typecheck || echo "cli typecheck skipped (depends on contract artifacts)"
-          fi
-      - name: Typecheck + build frontend
-        run: |
-          if [ -f frontend/package.json ]; then
-            cd frontend
-            npm install --no-audit --no-fund
-            npm run build
-          fi
+# Hackathon CI: builds the frontend only. Contract + CLI typecheck depend on
+# the Compact toolchain + compiled artifacts which can't run on GitHub Actions
+# Ubuntu runners. Local Mac dev environment validates those workspaces.
 
-  playwright:
+jobs:
+  frontend:
     runs-on: ubuntu-latest
-    needs: typecheck
-    if: ${{ false }}  # disabled until frontend has full claim-flow E2E wired to deployed contract
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install + test
+      - name: Install workspace
         run: |
-          if [ -f frontend/package.json ]; then
-            cd frontend
-            npm install --no-audit --no-fund
-            npx playwright install --with-deps chromium
-            npm run build
-            npx playwright test
-          fi
+          cd frontend
+          npm install --no-audit --no-fund
+      - name: Typecheck
+        run: |
+          cd frontend
+          npx tsc -b --noEmit
+      - name: Build
+        run: |
+          cd frontend
+          npm run build
