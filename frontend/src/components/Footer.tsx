@@ -5,7 +5,7 @@ export function Footer() {
         <div>
           <p className="font-display italic text-2xl text-white">SafePassage</p>
           <p className="text-xs text-white/40 mt-1">
-            Built solo at the MLH Midnight Hackathon, May 15-17 2026.
+            Built by Stephen Sookra &amp; Vinh at the MLH Midnight Hackathon, May 15-17 2026.
           </p>
         </div>
         <div className="flex flex-wrap gap-6 text-xs text-white/50">
@@ -16,13 +16,13 @@ export function Footer() {
             GitHub
           </a>
           <a
-            href="https://github.com/StephenSook/SafePassage/blob/claude/safepassage-hackathon-HsbSl/docs/threat-model.md"
+            href="https://github.com/StephenSook/SafePassage/blob/main/docs/threat-model.md"
             className="hover:text-white transition-colors"
           >
             Threat model
           </a>
           <a
-            href="https://github.com/StephenSook/SafePassage/blob/claude/safepassage-hackathon-HsbSl/LICENSE"
+            href="https://github.com/StephenSook/SafePassage/blob/main/LICENSE"
             className="hover:text-white transition-colors"
           >
             Apache-2.0
