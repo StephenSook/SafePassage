@@ -1,0 +1,12 @@
+{
+  "folders": [
+    { "path": "." },
+    { "path": "contract" },
+    { "path": "cli" },
+    { "path": "frontend" }
+  ],
+  "settings": {
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "editor.formatOnSave": true
+  }
+}
