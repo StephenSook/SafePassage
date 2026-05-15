@@ -1,0 +1,29 @@
+node_modules/
+dist/
+build/
+.DS_Store
+.env
+.env.local
+
+# Compact-generated artifacts (regenerable from source)
+contract/src/managed/
+
+# Local proof / private-state stores
+*.leveldb/
+*-private-state/
+
+# Mainnet deploy outputs (contain tx hashes; commit selectively)
+deployment/*.json
+
+# Demo recordings (large; hosted externally)
+demo/*.mov
+demo/*.mp4
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
