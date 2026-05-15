@@ -5,7 +5,7 @@ export function Footer() {
         <div>
           <p className="font-display italic text-2xl text-white">SafePassage</p>
           <p className="text-xs text-white/40 mt-1">
-            Built by Stephen Sookra &amp; Vinh at the MLH Midnight Hackathon, May 15-17 2026.
+            Stephen Sookra (frontend, design, pitch) &amp; Vinh Le (backend). MLH Midnight Hackathon, May 15-17 2026.
           </p>
         </div>
         <div className="flex flex-wrap gap-6 text-xs text-white/50">

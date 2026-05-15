@@ -6,7 +6,7 @@
 
 ### 0:00 - 0:15 (Hook + harm)
 
-"Hey, I'm Stephen, and this is my demo for the Midnight Hackathon. I'm building SafePassage with my teammate Vinh.
+"Hey, I'm Stephen, and this is my demo for the Midnight Hackathon. I built SafePassage with Vinh Le on backend.
 
 Meet someone with eleven minutes alone each day. For an intimate partner violence survivor, every financial tool she touches leaves a digital trail her abuser monitors. The moment she prepares to leave, he knows."
 

@@ -11,7 +11,7 @@ Privacy-preserving emergency disbursement on the Midnight network. SafePassage r
 
 **Contract:** Preprod-deployed for prize eligibility; mainnet deployment is the stretch target *(see `deployment/deploy-output.json` once deployed)*. Per Midnight Foundation Discord guidance 2026-05-15: mainnet is not required for prize eligibility — Preprod is sufficient. SafePassage targets mainnet anyway for institutional credibility against the Technology + Completion + Business Value judging dimensions.
 
-**Hackathon submission:** MLH Midnight Hackathon, May 15-17 2026. DeFi Track + Top 2 Overall (Build Club accelerator). Team: Stephen Sookra, Vinh.
+**Hackathon submission:** MLH Midnight Hackathon, May 15-17 2026. DeFi Track + Top 2 Overall (Build Club accelerator). Team: **Stephen Sookra** (frontend, design, pitch) + **Vinh Le** (backend).
 
 ---
 
@@ -33,7 +33,7 @@ The result: **the abuser watching the blockchain sees a state crime-victim fund 
 
 Prior shipped privacy primitives: **GroundVault** (confidential RWA vault for Community Land Trusts using ERC-7984 / ERC-7540 / ERC-3643 + Nox TEE on Arbitrum — iExec Vibe Coding Challenge entry) and **Compass for 0G** (31-day mainnet build using ERC-7857 Agent ID + sealed-inference TEE + SD-JWT verifiable credentials — APAC Track 5: Privacy & Sovereign Infrastructure). Both target the exact intersection SafePassage extends: mathematically-verifiable private state with on-chain audit receipts and zero linkability to the protected party.
 
-**Vinh** *(teammate)* — supporting team member.
+**Vinh Le** *(backend)* — Compact contract, CLI, Midnight.js provider wiring.
 
 ## Architecture
 
@@ -135,7 +135,7 @@ Apache-2.0. See [LICENSE](LICENSE).
 
 ## Acknowledgments
 
-Built during the MLH Midnight Hackathon, May 15-17 2026, by Stephen Sookra and Vinh. References against [`midnightntwrk/example-zkloan`](https://github.com/midnightntwrk/example-zkloan) (canonical Compact + witness-vs-ledger pattern source). IPV-tech threat modeling grounded in NNEDV Safety Net Project, Cornell Tech Clinic to End Tech Abuse (Diana Freed et al.), and USENIX Security 2023 audit of financial-app UI-bound adversaries.
+Built during the MLH Midnight Hackathon, May 15-17 2026, by Stephen Sookra (frontend, design, pitch) and Vinh Le (backend). References against [`midnightntwrk/example-zkloan`](https://github.com/midnightntwrk/example-zkloan) (canonical Compact + witness-vs-ledger pattern source). IPV-tech threat modeling grounded in NNEDV Safety Net Project, Cornell Tech Clinic to End Tech Abuse (Diana Freed et al.), and USENIX Security 2023 audit of financial-app UI-bound adversaries.
 
 ## Judging criteria mapping
 

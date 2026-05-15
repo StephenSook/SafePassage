@@ -28,7 +28,7 @@ export function BuildClubCTA() {
             <div>
               <p className="font-display italic text-3xl text-white mb-2">SafePassage</p>
               <p className="text-sm text-white/65 leading-relaxed">
-                Privacy-preserving emergency disbursement. MLH Midnight Hackathon, May 2026. Built by Stephen Sookra &amp; Vinh. <span className="text-accent">(This project.)</span>
+                Privacy-preserving emergency disbursement. MLH Midnight Hackathon, May 2026. Stephen Sookra (frontend, design, pitch) &amp; Vinh Le (backend). <span className="text-accent">(This project.)</span>
               </p>
             </div>
             <div>
