@@ -19,6 +19,13 @@ deployment/*.json
 demo/*.mov
 demo/*.mp4
 
+# Research papers - LOCAL ONLY. These are private IP (Sookra Methodology,
+# multi-model research lanes). Keep on developer disk in research/ for context
+# but never publish in the GitHub repo.
+*.pdf
+research/*.pdf
+research/**/*.pdf
+
 # IDE
 .vscode/
 .idea/
