@@ -31,9 +31,9 @@ Would anyone on the team have 15 minutes Sunday morning (May 17) for a
 quick review call before I submit to Devpost? Even a Slack/email
 exchange would dramatically strengthen the project's grounding.
 
-Background: I won 2nd place at the Wells Fargo Global Career
-Accelerator last year for SafeHaven, an AI domestic-financial-abuse
-detection tool. SafePassage is the next layer.
+My background is in privacy-preserving infrastructure for vulnerable
+populations - building with zero-knowledge proofs, confidential token
+standards, and trusted-execution environments.
 
 GitHub (in progress): https://github.com/StephenSook/SafePassage
 
@@ -73,9 +73,9 @@ Would anyone on the team have 15 minutes Sunday morning (May 17) for a
 review call before I submit to Devpost? Even an asynchronous review of
 my threat model document would be enormously valuable.
 
-Background: I won 2nd place at the Wells Fargo Global Career
-Accelerator last year for SafeHaven, an AI domestic-financial-abuse
-detection tool. SafePassage is the next layer.
+My background is in privacy-preserving infrastructure for vulnerable
+populations - building with zero-knowledge proofs, confidential token
+standards, and trusted-execution environments.
 
 GitHub (in progress): https://github.com/StephenSook/SafePassage
 Threat model: https://github.com/StephenSook/SafePassage/blob/main/docs/threat-model.md
@@ -118,9 +118,9 @@ Would anyone at PADV have 15 minutes Sunday morning (May 17) for a
 short review call before I submit to Devpost? Even an email exchange
 on the operational fit would be incredibly valuable.
 
-Background: I won 2nd place at the Wells Fargo Global Career
-Accelerator last year for SafeHaven, an AI domestic-financial-abuse
-detection tool. SafePassage is the next layer.
+My background is in privacy-preserving infrastructure for vulnerable
+populations - building with zero-knowledge proofs, confidential token
+standards, and trusted-execution environments.
 
 GitHub (in progress): https://github.com/StephenSook/SafePassage
 

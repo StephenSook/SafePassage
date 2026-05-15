@@ -38,7 +38,7 @@ Now look back at the app."
 
 SafePassage isn't a charity project. It is B2B compliance infrastructure for state coalitions, automating federal grant audits while protecting survivors.
 
-We are capturing a multi-billion-dollar flow of emergency aid. This is part two of a three-part founder thesis on financial-abuse defense. With an invitation to the Build Club, we are ready to make this the interoperable standard for vulnerable-population disbursements.
+We are capturing a multi-billion-dollar flow of emergency aid. With an invitation to the Build Club, we are ready to make this the interoperable standard for vulnerable-population disbursements.
 
 Thank you."
 

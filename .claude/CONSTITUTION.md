@@ -30,7 +30,7 @@ Out of scope: mobile-native ZK, sponsored-tx relayer service, multi-shelter gove
 - Compiled artifacts via npm run compact; gitignore contract/src/managed/
 - Demo wallet seed phrase stored OFFLINE (paper) only
 - Every commit lands as separate atomic GitHub contribution (green-dot policy)
-- README hero leads with mainnet contract address + founder bio + SafeHaven Wells Fargo precedent
+- README hero leads with contract address (Preprod prize-eligible, mainnet stretch) + team credits + tagline
 - Section 9 framework used for any README description block
 
 ### ASK FIRST

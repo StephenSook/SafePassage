@@ -25,13 +25,7 @@ The result: **the abuser watching the blockchain sees a state crime-victim fund 
 
 ## Team
 
-**Stephen Sookra** *(lead engineer, design, pitch)* — CS sophomore in Atlanta, GA. Builds privacy infrastructure for vulnerable populations. SafePassage is part 2 of a three-part founder thesis on financial-abuse defense:
-
-1. **SafeHaven** — AI domestic-financial-abuse detection. 2nd place, Wells Fargo Global Career Accelerator 2026.
-2. **SafePassage** *(this project)* — privacy-preserving emergency disbursement on Midnight mainnet. MLH Midnight Hackathon, May 2026.
-3. **SafeReturn** *(roadmap)* — post-exit financial recovery for survivors rebuilding credit and savings.
-
-Prior shipped privacy primitives: **GroundVault** (confidential RWA vault for Community Land Trusts using ERC-7984 / ERC-7540 / ERC-3643 + Nox TEE on Arbitrum — iExec Vibe Coding Challenge entry) and **Compass for 0G** (31-day mainnet build using ERC-7857 Agent ID + sealed-inference TEE + SD-JWT verifiable credentials — APAC Track 5: Privacy & Sovereign Infrastructure). Both target the exact intersection SafePassage extends: mathematically-verifiable private state with on-chain audit receipts and zero linkability to the protected party.
+**Stephen Sookra** *(frontend, design, pitch)* — CS sophomore in Atlanta, GA. Builds privacy infrastructure for vulnerable populations using zero-knowledge proofs, confidential token standards, and trusted-execution environments. SafePassage is a roadmap toward **SafeReturn** *(future)* — post-exit financial recovery for survivors rebuilding credit and savings.
 
 **Vinh Le** *(backend)* — Compact contract, CLI, Midnight.js provider wiring.
 
@@ -65,7 +59,7 @@ See [`docs/dust-sponsoring.md`](docs/dust-sponsoring.md). v1 uses advocate-paid 
 
 ## Sookra Methodology
 
-This project was developed using the [Sookra Methodology](research/sookra-methodology-v3.3.pdf) - a five-pillar hackathon framework distilled from 10+ Atlanta hackathons (StepSafe 1st HMI, SafeHaven 2nd Wells Fargo GCA, Saber 3rd Vibra ATL, PyroLens 2nd/3rd KSU Social Good, EchoPay 3rd KSU FinTech).
+This project was developed using a five-pillar hackathon framework that emphasizes specific people with specific problems, structural gaps no existing consumer tool addresses, sourced human-scale statistics, technology as the inevitable answer, and concrete business numbers.
 
 **Pillar 1 - Real problem, specific people.** IPV survivor with 11 minutes alone, every financial tool watched. Validator receipts from USENIX Security 2023, Cornell Tech CETA (Diana Freed), NNEDV Safety Net (Erica Olsen) - see [`docs/validator-receipts.md`](docs/validator-receipts.md). Live outreach to NNEDV / CETA / PADV sent on build day - see [`research/outreach/sent-emails.md`](research/outreach/sent-emails.md).
 

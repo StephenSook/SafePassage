@@ -625,8 +625,7 @@ Must include, in order:
    Identity stayed." + DeFi Track + Top 2 Overall badges.
 2. **Why this exists** (3 sentences): the survivor problem; why on-chain
    privacy is the answer; why Midnight specifically.
-3. **Founder bio paragraph** with SafeHaven Wells Fargo 2nd-place precedent.
-   This is your strongest single trust signal — top of README, not buried.
+3. **Team bio paragraph** crediting Stephen Sookra (frontend, design, pitch) + Vinh Le (backend). Top of README, not buried.
 4. **Architecture** diagram + Midnight stack pin table.
 5. **Why Midnight, not Aleo / Aztec / FHE** (1 paragraph). Build Club will
    ask. Answer it before they have to.
@@ -775,7 +774,7 @@ Every item below must exist in the repo before Devpost submission:
 - [ ] `LICENSE` (Apache-2.0)
 - [ ] `docs/threat-model.md` — 1 page minimum
 - [ ] `docs/dust-sponsoring.md` — relayer sketch
-- [ ] README founder bio paragraph (top, includes SafeHaven Wells Fargo)
+- [ ] README team bio paragraph (top, credits Stephen + Vinh Le)
 - [ ] README "Why Midnight, not Aleo/Aztec/FHE" paragraph
 - [ ] README "Verify yourself" curl-against-indexer block
 - [ ] `research/outreach/` directory with sent-emails evidence

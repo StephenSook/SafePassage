@@ -206,8 +206,7 @@ README updated to map each repo asset to one criterion at the bottom of the file
 - `docs/threat-model.md` — adversary model, what leaks, what's protected.
   One page beats nothing.
 - README paragraph: "Why Midnight, not Aleo / Aztec / FHE."
-- README paragraph: founder bio + SafeHaven Wells Fargo precedent (top of
-  README, first 500 words).
+- README paragraph: team bio (Stephen + Vinh Le) at top of README, first 500 words.
 - `LICENSE` file (Apache-2.0).
 - `docs/dust-sponsoring.md` — relayer architecture sketch (1 page),
   unimplemented but designed.

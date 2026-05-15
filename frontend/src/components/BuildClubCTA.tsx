@@ -11,20 +11,14 @@ export function BuildClubCTA() {
           transition={{ duration: 0.9 }}
           className="liquid-glass rounded-[2rem] p-10 md:p-16 noise-overlay"
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-8">// Part 2 of a 3-part founder thesis</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-8">// Build Club</p>
 
           <h2 className="text-3xl md:text-5xl text-white tracking-tight leading-tight mb-8 max-w-3xl">
             Privacy infrastructure for vulnerable populations is a{' '}
             <em className="font-display italic text-accent">multi-billion-dollar</em> gap we are just starting to fill.
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 max-w-3xl">
-            <div>
-              <p className="font-display italic text-3xl text-accent mb-2">SafeHaven</p>
-              <p className="text-sm text-white/50 leading-relaxed">
-                AI domestic-financial-abuse detection. 2nd place, Wells Fargo Global Career Accelerator 2026.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 max-w-3xl">
             <div>
               <p className="font-display italic text-3xl text-white mb-2">SafePassage</p>
               <p className="text-sm text-white/65 leading-relaxed">
@@ -34,7 +28,7 @@ export function BuildClubCTA() {
             <div>
               <p className="font-display italic text-3xl text-white/50 mb-2">SafeReturn</p>
               <p className="text-sm text-white/40 leading-relaxed">
-                Post-exit financial recovery. Roadmap.
+                Post-exit financial recovery for survivors rebuilding credit and savings. Roadmap layer powered by Build Club mentorship.
               </p>
             </div>
           </div>
