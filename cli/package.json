@@ -1,0 +1,44 @@
+{
+  "name": "@safepassage/cli",
+  "version": "0.1.0",
+  "author": "Stephen Sookra",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cli": "tsx src/cli.ts",
+    "deploy": "tsx src/scripts/deploy.ts",
+    "fund-pool": "tsx src/scripts/fund-pool.ts",
+    "register-code": "tsx src/scripts/register-code.ts",
+    "claim": "tsx src/scripts/claim.ts",
+    "query-ledger": "tsx src/scripts/query-ledger.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "rm -rf dist && tsc --project tsconfig.build.json"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "0.15.0",
+    "@midnight-ntwrk/dapp-connector-api": "4.0.1",
+    "@midnight-ntwrk/ledger-v8": "8.0.3",
+    "@midnight-ntwrk/midnight-js-contracts": "4.0.4",
+    "@midnight-ntwrk/midnight-js-fetch-zswap-network-id": "4.0.4",
+    "@midnight-ntwrk/midnight-js-http-client-proof-provider": "4.0.4",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "4.0.4",
+    "@midnight-ntwrk/midnight-js-level-private-state-provider": "4.0.4",
+    "@midnight-ntwrk/midnight-js-node-zk-config-provider": "4.0.4",
+    "@midnight-ntwrk/midnight-js-types": "4.0.4",
+    "@midnight-ntwrk/midnight-js-utils": "4.0.4",
+    "@midnight-ntwrk/wallet-sdk-facade": "3.0.0",
+    "@midnight-ntwrk/wallet-sdk-hd": "3.0.0",
+    "@safepassage/contract": "*",
+    "fp-ts": "^2.16.0",
+    "pino": "^9.0.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/yargs": "^17.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
