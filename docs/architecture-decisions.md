@@ -5,6 +5,24 @@ dated; reversed decisions are struck through, not deleted.
 
 ---
 
+## 2026-05-15 — Remote container vs. Mac dev environment
+
+Two distinct environments are in play during this build:
+
+- **Remote container (this session):** Linux x86_64, Node 22, Docker available
+  but Docker Hub *anonymous* pull rate limit blocks `proof-server:8.0.3` here.
+  No Midnight `compact` devtool is packaged for a headless Linux install
+  path. **Therefore: this container is for source authoring, git history,
+  and any test that doesn't need the Midnight runtime.** Source code lands
+  here, compilation + proof generation happens on the Mac.
+- **Local Mac (yours):** Authoritative environment for `compact compile`,
+  `docker run midnightntwrk/proof-server`, Lace wallet flows, mainnet deploy,
+  and demo recording. **The Hour-2 kill switch is verified there**, not here.
+
+Reference contract source-of-truth lives at `/tmp/example-zkloan` in this
+container (cloned `midnightntwrk/example-zkloan` at depth 1, 2026-05-15).
+Re-clone on your Mac before starting Phase 1.
+
 ## 2026-05-15 — Phase 0 environment
 
 - **Dev environment is Linux x86_64** (remote container, Node 22, Docker
