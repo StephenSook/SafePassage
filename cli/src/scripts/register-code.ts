@@ -1,9 +1,10 @@
+// @ts-nocheck - depends on contract artifacts (npm run compact in contract/).
+import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
+import { resolve } from 'path';
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import { Contract } from '@safepassage/contract/managed/safepassage/contract';
 import { adminWitnesses, hashCode, newIssuerSalt } from '@safepassage/contract';
-import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
-import { resolve } from 'path';
-import { providers } from '../commons.js';
+import { loadConfig, buildProviders, contractConfig } from '../commons.js';
 import { loadDeployment, parseCategory } from '../helpers.js';
 
 const REGISTRY_PATH = resolve(process.cwd(), '../demo/registered-codes.json');
@@ -31,21 +32,24 @@ export async function main(): Promise<void> {
   const { digest, commitment } = hashCode(rawCode);
   const salt = newIssuerSalt();
 
+  const config = loadConfig();
+  const accountId = process.env.SAFEPASSAGE_ACCOUNT_ID ?? 'safepassage-admin-dev';
+  const providers = buildProviders(config, accountId);
   const { contractAddress } = loadDeployment();
-  const deployed = await findDeployedContract(providers('safepassage-admin'), {
+
+  const deployed = await findDeployedContract(providers, {
     contractAddress,
     contract: new Contract(adminWitnesses),
-    privateStateId: 'safepassage-admin',
+    privateStateId: contractConfig.privateStateStoreName,
     initialPrivateState: {},
   });
 
   const tx = await deployed.callTx.registerCode(commitment, category, BigInt(cap));
   console.log(`registerCode submitted. Tx: ${tx.public.txId}`);
   console.log(`  Commitment: ${commitment.toString('hex')}`);
-  console.log(`  Category: ${categoryStr}`);
-  console.log(`  Cap: ${cap}`);
+  console.log(`  Category:   ${categoryStr}`);
+  console.log(`  Cap:        ${cap}`);
 
-  // Persist locally so the demo claim can replay the digest+salt pair
   const entry: CodeEntry = {
     rawCode,
     category: categoryStr,
@@ -57,7 +61,7 @@ export async function main(): Promise<void> {
   };
   mkdirSync(resolve(process.cwd(), '../demo'), { recursive: true });
   const existing: CodeEntry[] = existsSync(REGISTRY_PATH)
-    ? JSON.parse(readFileSync(REGISTRY_PATH, 'utf8'))
+    ? (JSON.parse(readFileSync(REGISTRY_PATH, 'utf8')) as CodeEntry[])
     : [];
   existing.push(entry);
   writeFileSync(REGISTRY_PATH, JSON.stringify(existing, null, 2));

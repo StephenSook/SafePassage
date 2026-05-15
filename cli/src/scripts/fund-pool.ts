@@ -1,7 +1,8 @@
+// @ts-nocheck - depends on contract artifacts (npm run compact in contract/).
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import { Contract } from '@safepassage/contract/managed/safepassage/contract';
 import { adminWitnesses } from '@safepassage/contract';
-import { providers } from '../commons.js';
+import { loadConfig, buildProviders, contractConfig } from '../commons.js';
 import { loadDeployment } from '../helpers.js';
 
 export async function main(): Promise<void> {
@@ -11,11 +12,15 @@ export async function main(): Promise<void> {
     process.exit(1);
   }
 
+  const config = loadConfig();
+  const accountId = process.env.SAFEPASSAGE_ACCOUNT_ID ?? 'safepassage-admin-dev';
+  const providers = buildProviders(config, accountId);
   const { contractAddress } = loadDeployment();
-  const deployed = await findDeployedContract(providers('safepassage-admin'), {
+
+  const deployed = await findDeployedContract(providers, {
     contractAddress,
     contract: new Contract(adminWitnesses),
-    privateStateId: 'safepassage-admin',
+    privateStateId: contractConfig.privateStateStoreName,
     initialPrivateState: {},
   });
 

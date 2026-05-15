@@ -1,9 +1,10 @@
+// @ts-nocheck - depends on contract artifacts (npm run compact in contract/).
+import { readFileSync, existsSync } from 'fs';
+import { resolve } from 'path';
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import { Contract } from '@safepassage/contract/managed/safepassage/contract';
 import { claimWitnesses } from '@safepassage/contract';
-import { readFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
-import { providers } from '../commons.js';
+import { loadConfig, buildProviders, contractConfig } from '../commons.js';
 import { loadDeployment, parseCategory } from '../helpers.js';
 
 const REGISTRY_PATH = resolve(process.cwd(), '../demo/registered-codes.json');
@@ -28,9 +29,9 @@ export async function main(): Promise<void> {
   }
 
   if (!existsSync(REGISTRY_PATH)) {
-    throw new Error(`No registered codes found. Run register-code first.`);
+    throw new Error('No registered codes found. Run register-code first.');
   }
-  const registry: CodeEntry[] = JSON.parse(readFileSync(REGISTRY_PATH, 'utf8'));
+  const registry: CodeEntry[] = JSON.parse(readFileSync(REGISTRY_PATH, 'utf8')) as CodeEntry[];
   const entry = registry.find((e) => e.rawCode === rawCode);
   if (!entry) {
     throw new Error(`Code "${rawCode}" not in registry. Did you register it?`);
@@ -40,11 +41,15 @@ export async function main(): Promise<void> {
   const salt = Buffer.from(entry.saltHex, 'hex');
   const category = parseCategory(categoryStr);
 
+  const config = loadConfig();
+  const accountId = process.env.SAFEPASSAGE_ACCOUNT_ID ?? 'safepassage-claimant-dev';
+  const providers = buildProviders(config, accountId);
   const { contractAddress } = loadDeployment();
-  const deployed = await findDeployedContract(providers('safepassage-claimant'), {
+
+  const deployed = await findDeployedContract(providers, {
     contractAddress,
     contract: new Contract(claimWitnesses(digest, salt)),
-    privateStateId: 'safepassage-claimant',
+    privateStateId: contractConfig.privateStateStoreName,
     initialPrivateState: {},
   });
 
@@ -52,8 +57,8 @@ export async function main(): Promise<void> {
     const tx = await deployed.callTx.claimSafePassage(category, BigInt(amount));
     console.log(`claim submitted. Tx: ${tx.public.txId}`);
     console.log(`  Category: ${categoryStr}`);
-    console.log(`  Amount: ${amount}`);
-    console.log(`  Pool balance ticks down. Nullifier consumed. No identity recorded.`);
+    console.log(`  Amount:   ${amount}`);
+    console.log('  Pool balance ticks down. Nullifier consumed. No identity recorded.');
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes('nullifier already used')) {

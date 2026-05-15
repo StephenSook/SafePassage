@@ -1,15 +1,20 @@
+// @ts-nocheck - depends on contract artifacts (npm run compact in contract/).
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import { Contract, ledger } from '@safepassage/contract/managed/safepassage/contract';
 import { adminWitnesses } from '@safepassage/contract';
-import { providers } from '../commons.js';
+import { loadConfig, buildProviders, contractConfig } from '../commons.js';
 import { loadDeployment } from '../helpers.js';
 
 export async function main(): Promise<void> {
+  const config = loadConfig();
+  const accountId = process.env.SAFEPASSAGE_ACCOUNT_ID ?? 'safepassage-reader-dev';
+  const providers = buildProviders(config, accountId);
   const { contractAddress } = loadDeployment();
-  const deployed = await findDeployedContract(providers('safepassage-reader'), {
+
+  const deployed = await findDeployedContract(providers, {
     contractAddress,
     contract: new Contract(adminWitnesses),
-    privateStateId: 'safepassage-reader',
+    privateStateId: contractConfig.privateStateStoreName,
     initialPrivateState: {},
   });
 
@@ -18,6 +23,7 @@ export async function main(): Promise<void> {
 
   console.log('SafePassage public ledger state');
   console.log(`  Contract:       ${contractAddress}`);
+  console.log(`  Network:        ${config.networkId}`);
   console.log(`  Admin:          ${pub.admin}`);
   console.log(`  Pool balance:   ${pub.poolBalance}`);
   console.log(`  Code commits:   ${pub.codeCommitments.size()}`);

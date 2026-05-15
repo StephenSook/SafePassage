@@ -1,3 +1,4 @@
+// @ts-nocheck - depends on contract artifacts (npm run compact in contract/).
 import { hashCode, newIssuerSalt } from '@safepassage/contract';
 
 /**
