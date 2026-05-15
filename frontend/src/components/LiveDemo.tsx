@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLaceWallet, shortAddress } from '../hooks/useLaceWallet';
 
 interface DemoState {
   poolBalance: number;
@@ -11,6 +12,7 @@ interface DemoState {
 const CATEGORIES = ['TRANSPORT', 'HOUSING', 'LEGAL', 'PRESCRIPTION'] as const;
 
 export function LiveDemo() {
+  const { status: wallet, connect: connectWallet, disconnect: disconnectWallet } = useLaceWallet();
   const [state, setState] = useState<DemoState>({
     poolBalance: 1000,
     nullifiers: 0,
@@ -142,7 +144,49 @@ export function LiveDemo() {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="liquid-glass rounded-3xl p-8"
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-6">Survivor view</p>
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-xs uppercase tracking-[0.3em] text-white/40">Survivor view</p>
+              {wallet.kind === 'connected' ? (
+                <button
+                  type="button"
+                  onClick={disconnectWallet}
+                  className="liquid-glass text-xs text-white/80 hover:text-white px-3 py-1.5 rounded-full transition-colors"
+                  title={wallet.address}
+                >
+                  {shortAddress(wallet.address)}
+                </button>
+              ) : wallet.kind === 'authorizing' ? (
+                <span className="text-xs text-accent/90">Authorizing...</span>
+              ) : wallet.kind === 'available' ? (
+                <button
+                  type="button"
+                  onClick={connectWallet}
+                  className="bg-white text-bg text-xs font-medium px-4 py-1.5 rounded-full hover:bg-white/90 transition-colors"
+                >
+                  Connect Lace
+                </button>
+              ) : wallet.kind === 'not-installed' ? (
+                <a
+                  href="https://midnight.network/wallet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/50 hover:text-white transition-colors"
+                >
+                  Install Lace
+                </a>
+              ) : wallet.kind === 'error' ? (
+                <button
+                  type="button"
+                  onClick={connectWallet}
+                  className="text-xs text-red-300 hover:text-red-200 transition-colors"
+                  title={wallet.error}
+                >
+                  Retry
+                </button>
+              ) : (
+                <span className="text-xs text-white/40">Detecting...</span>
+              )}
+            </div>
             <h3 className="text-lg text-white mb-6">Submit emergency claim</h3>
 
             <form onSubmit={handleSubmit} className="space-y-5">
