@@ -1,0 +1,80 @@
+pragma language_version 0.22;
+
+import CompactStandardLibrary;
+
+// ---- Types ----
+export enum Category { HOUSING, TRANSPORT, LEGAL, PRESCRIPTION }
+
+// ---- Public ledger state ----
+export ledger admin: ZswapCoinPublicKey;
+export ledger codeCommitments: Set<Bytes<32>>;
+export ledger revokedCommitments: Set<Bytes<32>>;
+export ledger nullifiers: Set<Bytes<32>>;
+export ledger codeCategory: Map<Bytes<32>, Category>;
+export ledger codeCap: Map<Bytes<32>, Uint<64>>;
+export ledger serviceRoutes: Map<Category, ZswapCoinPublicKey>;
+export ledger poolBalance: Uint<64>;
+
+// ---- Witnesses (private inputs supplied off-chain) ----
+witness codeDigest(): Bytes<32>;
+witness issuerSalt(): Bytes<32>;
+
+constructor() {
+    admin = ownPublicKey();
+    poolBalance = 0;
+}
+
+export circuit getAdmin(): ZswapCoinPublicKey {
+    return admin;
+}
+
+// ---- Admin circuits ----
+export circuit fundPool(amount: Uint<64>): [] {
+    assert(ownPublicKey() == admin, "fundPool: only admin");
+    poolBalance = poolBalance + amount;
+    return [];
+}
+
+export circuit registerCode(commitment: Bytes<32>, category: Category, cap: Uint<64>): [] {
+    assert(ownPublicKey() == admin, "registerCode: only admin");
+    assert(!codeCommitments.member(commitment), "registerCode: already registered");
+    codeCommitments.insert(commitment);
+    codeCategory.insert(commitment, category);
+    codeCap.insert(commitment, cap);
+    return [];
+}
+
+export circuit revokeCode(commitment: Bytes<32>): [] {
+    assert(ownPublicKey() == admin, "revokeCode: only admin");
+    assert(codeCommitments.member(commitment), "revokeCode: not registered");
+    revokedCommitments.insert(commitment);
+    return [];
+}
+
+export circuit setServiceRoute(category: Category, route: ZswapCoinPublicKey): [] {
+    assert(ownPublicKey() == admin, "setServiceRoute: only admin");
+    serviceRoutes.insert(category, route);
+    return [];
+}
+
+// ---- Survivor claim circuit (the killer feature) ----
+export circuit claimSafePassage(category: Category, amount: Uint<64>): [] {
+    const digest = codeDigest();
+    const salt = issuerSalt();
+
+    const commitment = persistentHash<Bytes<32>>(digest);
+    assert(codeCommitments.member(commitment), "claim: invalid code");
+    assert(!revokedCommitments.member(commitment), "claim: code revoked");
+    assert(codeCategory.lookup(commitment) == category, "claim: wrong category");
+    assert(amount <= codeCap.lookup(commitment), "claim: over cap");
+
+    const nullifier = persistentHash<Vector<2, Bytes<32>>>([digest, salt]);
+    assert(!nullifiers.member(nullifier), "claim: nullifier already used");
+    nullifiers.insert(nullifier);
+
+    assert(poolBalance >= amount, "claim: pool empty");
+    poolBalance = poolBalance - amount;
+
+    assert(serviceRoutes.member(category), "claim: no route for category");
+    return [];
+}
