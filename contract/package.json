@@ -1,0 +1,31 @@
+{
+  "name": "@safepassage/contract",
+  "version": "0.1.0",
+  "author": "Stephen Sookra",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./managed/safepassage/contract": {
+      "types": "./dist/managed/safepassage/contract/index.d.ts",
+      "import": "./dist/managed/safepassage/contract/index.js",
+      "default": "./dist/managed/safepassage/contract/index.js"
+    }
+  },
+  "scripts": {
+    "compact": "compact compile src/safepassage.compact src/managed/safepassage",
+    "test": "vitest run",
+    "test:compile": "npm run compact && vitest run",
+    "build": "rm -rf dist && tsc --project tsconfig.build.json && cp -Rf ./src/managed ./dist/managed && cp ./src/safepassage.compact ./dist",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}
