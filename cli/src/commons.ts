@@ -4,6 +4,7 @@ import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-p
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
+import { createWalletAndMidnightProvider, type WalletContext } from './wallet.js';
 
 /**
  * Runtime config for SafePassage CLI.
@@ -93,7 +94,10 @@ export function loadConfig(): NetworkConfig {
  * The `privateStoragePasswordProvider` MUST return a string. For development
  * we read from MIDNIGHT_STORAGE_PASSWORD env. Never check in a real password.
  */
-export function buildProviders(config: NetworkConfig, accountId: string) {
+export async function buildProviders(
+  config: NetworkConfig,
+  walletContext: WalletContext,
+) {
   const storagePassword = process.env.MIDNIGHT_STORAGE_PASSWORD;
   if (!storagePassword) {
     throw new Error(
@@ -102,7 +106,9 @@ export function buildProviders(config: NetworkConfig, accountId: string) {
     );
   }
 
+  const accountId = walletContext.unshieldedKeystore.getBech32Address().asString();
   const zkConfigProvider = new NodeZkConfigProvider(contractConfig.zkConfigPath);
+  const walletAndMidnight = await createWalletAndMidnightProvider(walletContext);
 
   return {
     privateStateProvider: levelPrivateStateProvider({
@@ -113,5 +119,7 @@ export function buildProviders(config: NetworkConfig, accountId: string) {
     publicDataProvider: indexerPublicDataProvider(config.indexer, config.indexerWS),
     zkConfigProvider,
     proofProvider: httpClientProofProvider(config.proofServer, zkConfigProvider),
+    walletProvider: walletAndMidnight,
+    midnightProvider: walletAndMidnight,
   };
 }

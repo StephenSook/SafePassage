@@ -1,10 +1,12 @@
-import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
-import { resolve } from 'path';
+import 'dotenv/config';
+import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
-import { Contract } from '@safepassage/contract/managed/safepassage/contract';
-import { adminWitnesses, hashCode, newIssuerSalt } from '@safepassage/contract';
+import { CompiledContract } from '@midnight-ntwrk/compact-js';
+import { SafePassage, adminWitnesses, emptyPrivateState } from '@safepassage/contract';
 import { loadConfig, buildProviders, contractConfig } from '../commons.js';
-import { loadDeployment, parseCategory } from '../helpers.js';
+import { buildWalletFromEnv, closeWallet } from '../wallet.js';
+import { loadDeployment, parseCategory, hashCode, newIssuerSalt } from '../helpers.js';
 
 const REGISTRY_PATH = resolve(process.cwd(), '../demo/registered-codes.json');
 
@@ -32,39 +34,50 @@ export async function main(): Promise<void> {
   const salt = newIssuerSalt();
 
   const config = loadConfig();
-  const accountId = process.env.SAFEPASSAGE_ACCOUNT_ID ?? 'safepassage-admin-dev';
-  const providers = buildProviders(config, accountId);
-  const { contractAddress } = loadDeployment();
+  const walletCtx = await buildWalletFromEnv(config);
+  try {
+    const providers = await buildProviders(config, walletCtx);
+    const { contractAddress } = loadDeployment();
 
-  const deployed = await findDeployedContract(providers, {
-    contractAddress,
-    contract: new Contract(adminWitnesses),
-    privateStateId: contractConfig.privateStateStoreName,
-    initialPrivateState: {},
-  });
+    const compiled = CompiledContract.make('SafePassage', SafePassage.Contract).pipe(
+      CompiledContract.withWitnesses(adminWitnesses),
+      CompiledContract.withCompiledFileAssets(contractConfig.zkConfigPath),
+    );
 
-  const tx = await deployed.callTx.registerCode(commitment, category, BigInt(cap));
-  console.log(`registerCode submitted. Tx: ${tx.public.txId}`);
-  console.log(`  Commitment: ${commitment.toString('hex')}`);
-  console.log(`  Category:   ${categoryStr}`);
-  console.log(`  Cap:        ${cap}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deployed = (await findDeployedContract(providers as any, {
+      contractAddress,
+      compiledContract: compiled,
+      privateStateId: contractConfig.privateStateStoreName,
+      initialPrivateState: emptyPrivateState,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    })) as any;
 
-  const entry: CodeEntry = {
-    rawCode,
-    category: categoryStr,
-    cap,
-    digestHex: digest.toString('hex'),
-    saltHex: salt.toString('hex'),
-    commitmentHex: commitment.toString('hex'),
-    registeredAt: new Date().toISOString(),
-  };
-  mkdirSync(resolve(process.cwd(), '../demo'), { recursive: true });
-  const existing: CodeEntry[] = existsSync(REGISTRY_PATH)
-    ? (JSON.parse(readFileSync(REGISTRY_PATH, 'utf8')) as CodeEntry[])
-    : [];
-  existing.push(entry);
-  writeFileSync(REGISTRY_PATH, JSON.stringify(existing, null, 2));
-  console.log(`  Saved digest+salt to ${REGISTRY_PATH}`);
+    const tx = await deployed.callTx.registerCode(commitment, category, BigInt(cap));
+    console.log(`registerCode submitted. Tx: ${tx.public.txId}`);
+    console.log(`  Commitment: ${commitment.toString('hex')}`);
+    console.log(`  Category:   ${categoryStr}`);
+    console.log(`  Cap:        ${cap}`);
+
+    const entry: CodeEntry = {
+      rawCode,
+      category: categoryStr,
+      cap,
+      digestHex: digest.toString('hex'),
+      saltHex: salt.toString('hex'),
+      commitmentHex: commitment.toString('hex'),
+      registeredAt: new Date().toISOString(),
+    };
+    mkdirSync(resolve(process.cwd(), '../demo'), { recursive: true });
+    const existing: CodeEntry[] = existsSync(REGISTRY_PATH)
+      ? (JSON.parse(readFileSync(REGISTRY_PATH, 'utf8')) as CodeEntry[])
+      : [];
+    existing.push(entry);
+    writeFileSync(REGISTRY_PATH, JSON.stringify(existing, null, 2));
+    console.log(`  Saved digest+salt to ${REGISTRY_PATH}`);
+  } finally {
+    await closeWallet(walletCtx);
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

@@ -1,36 +1,55 @@
-import { createHash, randomBytes } from 'crypto';
-import { type WitnessContext } from '@midnight-ntwrk/compact-runtime';
+import type { WitnessContext } from '@midnight-ntwrk/compact-runtime';
+import type { Ledger } from './managed/safepassage/contract/index.js';
 
 /**
- * Witnesses for the admin deployment + admin-only circuits.
- * Admin identity is established by ownPublicKey() in the contract, so no
- * secret witness is needed for admin gating - the wallet signing the tx
- * IS the admin proof.
+ * Private state for SafePassage circuits.
+ *
+ * Admin flow (deploy, fundPool, registerCode, revokeCode, setServiceRoute)
+ * doesn't call witnesses. Claimant flow (claimSafePassage) reads two
+ * Bytes<32> witnesses: codeDigest and issuerSalt.
+ *
+ * Claimant private state holds the raw digest + salt for the single code
+ * the survivor is claiming. The CLI / frontend writes this into the private
+ * state store before submitting the claim transaction.
  */
-export const adminWitnesses = {};
+export type SafePassagePrivateState = {
+  codeDigest: Uint8Array;
+  issuerSalt: Uint8Array;
+};
+
+export const emptyPrivateState: SafePassagePrivateState = {
+  codeDigest: new Uint8Array(32),
+  issuerSalt: new Uint8Array(32),
+};
 
 /**
- * Witnesses for the survivor claim flow. The survivor supplies:
- *   - codeDigest: sha256(rawCode) - knowledge of the one-time code
- *   - issuerSalt: random per-issuance salt - domain-separates the nullifier
+ * Admin-side witnesses. Even though admin circuits don't reference
+ * codeDigest / issuerSalt, the generated Contract type requires both
+ * witnesses to be supplied. Returning the private state value is harmless
+ * for circuits that never consume the witness output.
  */
-export const claimWitnesses = (codeDigest: Buffer, issuerSalt: Buffer) => ({
-  codeDigest: (_ctx: WitnessContext<unknown, unknown>) => [codeDigest],
-  issuerSalt: (_ctx: WitnessContext<unknown, unknown>) => [issuerSalt],
-});
+export const adminWitnesses = {
+  codeDigest: (
+    { privateState }: WitnessContext<Ledger, SafePassagePrivateState>,
+  ): [SafePassagePrivateState, Uint8Array] => [privateState, privateState.codeDigest],
+  issuerSalt: (
+    { privateState }: WitnessContext<Ledger, SafePassagePrivateState>,
+  ): [SafePassagePrivateState, Uint8Array] => [privateState, privateState.issuerSalt],
+};
 
 /**
- * Off-chain hashing - the commitment stored on-chain is sha256(sha256(code)).
- * The first sha256 is the codeDigest (private witness); the second is the
- * commitment (public ledger membership check).
+ * Claimant-side witnesses scoped to a single claim. The CLI/frontend
+ * supplies the survivor's specific digest + salt for one transaction.
  */
-export function hashCode(rawCode: string): { digest: Buffer; commitment: Buffer } {
-  const digest = createHash('sha256').update(rawCode).digest();
-  const commitment = createHash('sha256').update(digest).digest();
-  return { digest, commitment };
-}
-
-/** Random 32-byte salt for nullifier domain separation. */
-export function newIssuerSalt(): Buffer {
-  return randomBytes(32);
+export function claimWitnesses(digest: Uint8Array, salt: Uint8Array) {
+  if (digest.length !== 32) throw new Error('codeDigest must be 32 bytes');
+  if (salt.length !== 32) throw new Error('issuerSalt must be 32 bytes');
+  return {
+    codeDigest: (
+      { privateState }: WitnessContext<Ledger, SafePassagePrivateState>,
+    ): [SafePassagePrivateState, Uint8Array] => [privateState, digest],
+    issuerSalt: (
+      { privateState }: WitnessContext<Ledger, SafePassagePrivateState>,
+    ): [SafePassagePrivateState, Uint8Array] => [privateState, salt],
+  };
 }

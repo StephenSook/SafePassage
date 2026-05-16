@@ -1,5 +1,6 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { createHash, randomBytes } from 'node:crypto';
 
 const DEPLOY_OUTPUT_PATH = resolve(process.cwd(), '../deployment/deploy-output.json');
 
@@ -38,4 +39,21 @@ export function parseCategory(s: string): number {
     throw new Error(`Invalid category: ${s}. Must be one of: ${Object.keys(CATEGORY).join(', ')}`);
   }
   return CATEGORY[upper];
+}
+
+/**
+ * Double-sha256 a raw shelter-issued code into the Bytes<32> digest that
+ * flows into persistentHash<Bytes<32>>(digest) -> codeCommitments. The
+ * commitment returned here is what the admin passes to registerCode.
+ */
+export function hashCode(rawCode: string): { digest: Buffer; commitment: Buffer } {
+  const first = createHash('sha256').update(rawCode, 'utf8').digest();
+  const digest = createHash('sha256').update(first).digest();
+  const commitment = createHash('sha256').update(digest).digest();
+  return { digest, commitment };
+}
+
+/** Fresh 32-byte issuer salt for a single code. */
+export function newIssuerSalt(): Buffer {
+  return Buffer.from(randomBytes(32));
 }
