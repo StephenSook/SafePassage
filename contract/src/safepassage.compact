@@ -1,4 +1,4 @@
-pragma language_version 0.22;
+pragma language_version 0.23;
 
 import CompactStandardLibrary;
 
@@ -31,29 +31,31 @@ export circuit getAdmin(): ZswapCoinPublicKey {
 // ---- Admin circuits ----
 export circuit fundPool(amount: Uint<64>): [] {
     assert(ownPublicKey() == admin, "fundPool: only admin");
-    poolBalance = poolBalance + amount;
+    poolBalance = (poolBalance + disclose(amount)) as Uint<64>;
     return [];
 }
 
 export circuit registerCode(commitment: Bytes<32>, category: Category, cap: Uint<64>): [] {
     assert(ownPublicKey() == admin, "registerCode: only admin");
-    assert(!codeCommitments.member(commitment), "registerCode: already registered");
-    codeCommitments.insert(commitment);
-    codeCategory.insert(commitment, category);
-    codeCap.insert(commitment, cap);
+    const commit = disclose(commitment);
+    assert(!codeCommitments.member(commit), "registerCode: already registered");
+    codeCommitments.insert(commit);
+    codeCategory.insert(commit, disclose(category));
+    codeCap.insert(commit, disclose(cap));
     return [];
 }
 
 export circuit revokeCode(commitment: Bytes<32>): [] {
     assert(ownPublicKey() == admin, "revokeCode: only admin");
-    assert(codeCommitments.member(commitment), "revokeCode: not registered");
-    revokedCommitments.insert(commitment);
+    const commit = disclose(commitment);
+    assert(codeCommitments.member(commit), "revokeCode: not registered");
+    revokedCommitments.insert(commit);
     return [];
 }
 
 export circuit setServiceRoute(category: Category, route: ZswapCoinPublicKey): [] {
     assert(ownPublicKey() == admin, "setServiceRoute: only admin");
-    serviceRoutes.insert(category, route);
+    serviceRoutes.insert(disclose(category), disclose(route));
     return [];
 }
 
@@ -62,19 +64,19 @@ export circuit claimSafePassage(category: Category, amount: Uint<64>): [] {
     const digest = codeDigest();
     const salt = issuerSalt();
 
-    const commitment = persistentHash<Bytes<32>>(digest);
+    const commitment = disclose(persistentHash<Bytes<32>>(digest));
     assert(codeCommitments.member(commitment), "claim: invalid code");
     assert(!revokedCommitments.member(commitment), "claim: code revoked");
-    assert(codeCategory.lookup(commitment) == category, "claim: wrong category");
-    assert(amount <= codeCap.lookup(commitment), "claim: over cap");
+    assert(codeCategory.lookup(commitment) == disclose(category), "claim: wrong category");
+    assert(disclose(amount) <= codeCap.lookup(commitment), "claim: over cap");
 
-    const nullifier = persistentHash<Vector<2, Bytes<32>>>([digest, salt]);
+    const nullifier = disclose(persistentHash<Vector<2, Bytes<32>>>([digest, salt]));
     assert(!nullifiers.member(nullifier), "claim: nullifier already used");
     nullifiers.insert(nullifier);
 
-    assert(poolBalance >= amount, "claim: pool empty");
-    poolBalance = poolBalance - amount;
+    assert(poolBalance >= disclose(amount), "claim: pool empty");
+    poolBalance = (poolBalance - disclose(amount)) as Uint<64>;
 
-    assert(serviceRoutes.member(category), "claim: no route for category");
+    assert(serviceRoutes.member(disclose(category)), "claim: no route for category");
     return [];
 }
