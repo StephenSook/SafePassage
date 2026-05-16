@@ -1,4 +1,3 @@
-// @ts-nocheck - depends on contract artifacts (npm run compact in contract/).
 import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';

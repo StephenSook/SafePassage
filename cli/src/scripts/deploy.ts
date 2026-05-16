@@ -1,5 +1,3 @@
-// @ts-nocheck - depends on contract/src/managed/safepassage artifacts that only exist after `npm run compact` in contract/.
-// Runtime is exercised on Mac after Compact toolchain installs; CI does not run this typecheck.
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { deployContract } from '@midnight-ntwrk/midnight-js-contracts';
