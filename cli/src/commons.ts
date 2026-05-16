@@ -33,8 +33,9 @@ export interface NetworkConfig {
 }
 
 export class StandaloneConfig implements NetworkConfig {
-  indexer = 'http://127.0.0.1:8088/api/v3/graphql';
-  indexerWS = 'ws://127.0.0.1:8088/api/v3/graphql/ws';
+  indexer = 'http://127.0.0.1:8088/api/v4/graphql';
+  indexerWS = 'ws://127.0.0.1:8088/api/v4/graphql/ws';
+  // ^ Standalone (local) - matches Build on Midnight slide 17: `localhost:8088/api/v4/graphql`
   node = 'http://127.0.0.1:9944';
   proofServer = 'http://127.0.0.1:6300';
   networkId = 'undeployed' as const;
@@ -44,8 +45,8 @@ export class StandaloneConfig implements NetworkConfig {
 }
 
 export class PreprodConfig implements NetworkConfig {
-  indexer = 'https://indexer.preprod.midnight.network/api/v3/graphql';
-  indexerWS = 'wss://indexer.preprod.midnight.network/api/v3/graphql/ws';
+  indexer = 'https://indexer.preprod.midnight.network/api/v4/graphql';
+  indexerWS = 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws';
   node = 'wss://rpc.preprod.midnight.network';
   proofServer = process.env.PROOF_SERVER ?? 'http://localhost:6300';
   networkId = 'preprod' as const;
@@ -55,8 +56,8 @@ export class PreprodConfig implements NetworkConfig {
 }
 
 export class MainnetConfig implements NetworkConfig {
-  indexer = 'https://indexer.midnight.network/api/v3/graphql';
-  indexerWS = 'wss://indexer.midnight.network/api/v3/graphql/ws';
+  indexer = 'https://indexer.midnight.network/api/v4/graphql';
+  indexerWS = 'wss://indexer.midnight.network/api/v4/graphql/ws';
   node = 'wss://rpc.midnight.network';
   proofServer = process.env.PROOF_SERVER ?? 'http://localhost:6300';
   networkId = 'mainnet' as const;
