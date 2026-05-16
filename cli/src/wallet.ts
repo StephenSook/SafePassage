@@ -13,11 +13,11 @@ import { ShieldedWallet } from '@midnight-ntwrk/wallet-sdk-shielded';
 import { DustWallet } from '@midnight-ntwrk/wallet-sdk-dust-wallet';
 import {
   createKeystore,
-  InMemoryTransactionHistoryStorage,
   PublicKey as UnshieldedPublicKey,
   type UnshieldedKeystore,
   UnshieldedWallet,
 } from '@midnight-ntwrk/wallet-sdk-unshielded-wallet';
+import { NoOpTransactionHistoryStorage } from '@midnight-ntwrk/wallet-sdk-abstractions';
 import type {
   MidnightProvider,
   WalletProvider,
@@ -104,7 +104,7 @@ async function initWalletWithSeed(
   const unshieldedConfig = {
     networkId: config.networkId,
     indexerClientConnection,
-    txHistoryStorage: new InMemoryTransactionHistoryStorage(),
+    txHistoryStorage: new NoOpTransactionHistoryStorage(),
   };
 
   const dustConfig = {
@@ -180,7 +180,7 @@ export async function registerNightForDust(
 
   const unregistered =
     state.unshielded?.availableCoins.filter(
-      (coin) => coin.meta.registeredForDustGeneration === false,
+      (coin) => coin.registeredForDustGeneration === false,
     ) ?? [];
 
   if (unregistered.length === 0) {
