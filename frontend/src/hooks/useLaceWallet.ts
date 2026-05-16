@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { DAppConnectorAPI, DAppConnectorWalletAPI } from '@midnight-ntwrk/dapp-connector-api';
+import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 
 /**
  * Lace wallet integration for SafePassage.
  *
  * Detects the Midnight DApp connector exposed by the Lace browser extension,
- * requests user authorization, and surfaces wallet state to React components.
+ * connects via the v4 API (`connect(networkId)`), and surfaces wallet state
+ * to React components. The hook targets dapp-connector-api 4.0.x: the older
+ * Cardano-style `isEnabled` / `enable` surface no longer exists.
  *
- * Phase 5 deploy wires the connected wallet into actual claim submission. For
- * now, the LiveDemo can render real "connected as <address>" status while
- * still simulating the submission flow until the contract is deployed.
+ * Phase 5 deploy wires the connected wallet into actual claim submission.
  */
 
 export type LaceConnectionStatus =
@@ -17,15 +17,18 @@ export type LaceConnectionStatus =
   | { kind: 'not-installed' }
   | { kind: 'available'; name: string; apiVersion: string }
   | { kind: 'authorizing' }
-  | { kind: 'connected'; address: string; coinPublicKey: string; api: DAppConnectorWalletAPI }
+  | { kind: 'connected'; address: string; coinPublicKey: string; api: ConnectedAPI }
   | { kind: 'error'; error: string };
 
-declare global {
-  interface Window {
-    midnight?: {
-      mnLace?: DAppConnectorAPI;
-    };
-  }
+const NETWORK_ID = (import.meta.env.VITE_MIDNIGHT_NETWORK_ID ?? 'preprod') as string;
+
+function findLaceConnector(): InitialAPI | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const root = window.midnight;
+  if (!root) return undefined;
+  // Lace registers under `mnLace` (per Midnight DApp Connector docs).
+  // Fall back to scanning entries to support future rdns shifts.
+  return root.mnLace ?? Object.values(root)[0];
 }
 
 export function useLaceWallet(): {
@@ -40,7 +43,7 @@ export function useLaceWallet(): {
 
     const probe = (attempt: number) => {
       if (cancelled) return;
-      const api = typeof window !== 'undefined' ? window.midnight?.mnLace : undefined;
+      const api = findLaceConnector();
       if (api) {
         setStatus({
           kind: 'available',
@@ -63,7 +66,7 @@ export function useLaceWallet(): {
   }, []);
 
   const connect = useCallback(async () => {
-    const dapp = window.midnight?.mnLace;
+    const dapp = findLaceConnector();
     if (!dapp) {
       setStatus({ kind: 'not-installed' });
       return;
@@ -71,31 +74,23 @@ export function useLaceWallet(): {
 
     setStatus({ kind: 'authorizing' });
     try {
-      const enabled = await dapp.isEnabled();
-      const api: DAppConnectorWalletAPI = enabled ? await dapp.enable() : await dapp.enable();
-      const stateApi = await api.state();
-      const state = await stateApi;
+      const api = await dapp.connect(NETWORK_ID);
+      const { shieldedAddress, shieldedCoinPublicKey } = await api.getShieldedAddresses();
 
-      // The shape of `state` depends on the connector version; both 4.0.x
-      // builds we test against expose `address` + `coinPublicKey`.
-      const address: string =
-        (state as { address?: string }).address ??
-        (state as { walletAddress?: string }).walletAddress ??
-        '';
-      const coinPublicKey: string =
-        (state as { coinPublicKey?: string }).coinPublicKey ??
-        (state as { coinPublicKeyLegacy?: string }).coinPublicKeyLegacy ??
-        '';
-
-      if (!address) {
+      if (!shieldedAddress) {
         setStatus({
           kind: 'error',
-          error: 'Lace returned no wallet address. Ensure the wallet is unlocked and on the correct network (Preprod).',
+          error: 'Lace returned no shielded address. Ensure the wallet is unlocked and on the correct network (Preprod).',
         });
         return;
       }
 
-      setStatus({ kind: 'connected', address, coinPublicKey, api });
+      setStatus({
+        kind: 'connected',
+        address: shieldedAddress,
+        coinPublicKey: shieldedCoinPublicKey ?? '',
+        api,
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setStatus({ kind: 'error', error: message });
@@ -105,7 +100,7 @@ export function useLaceWallet(): {
   const disconnect = useCallback(() => {
     setStatus({ kind: 'detecting' });
     setTimeout(() => {
-      const dapp = window.midnight?.mnLace;
+      const dapp = findLaceConnector();
       if (dapp) {
         setStatus({
           kind: 'available',
